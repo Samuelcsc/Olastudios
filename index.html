@@ -226,7 +226,7 @@
     .hero.vertical h1 { overflow-wrap: break-word; }
   }
 
-  /* ---------- Work ---------- */
+  /* ---------- Video ---------- */
   section { padding: clamp(36px, 5vw, 64px) var(--pad); }
   .section-head {
     display: flex;
@@ -444,7 +444,7 @@
 <nav class="nav" aria-label="Main">
   <a class="brand" href="#top" aria-label="Ola Studios, back to top"><img id="navLogo" src="logo.png" alt="Ola Studios" width="88" height="88"></a>
   <div class="nav-links">
-    <a href="#work">Work</a>
+    <a href="#video">Video</a>
     <a href="#contact">Contact</a>
   </div>
 </nav>
@@ -459,7 +459,7 @@
     <h1 id="heroTitle">Films imagined, <em>made with AI.</em></h1>
     <p class="hero-sub" id="heroSub"></p>
     <div class="hero-actions">
-      <a class="btn primary" href="#work">See the work</a>
+      <a class="btn primary" href="#video">See the video</a>
       <a class="btn" href="#contact">Get in touch</a>
     </div>
     <p class="hero-hint" id="heroHint">Add your showreel’s Vimeo ID in the SITE settings to play it here.</p>
@@ -467,10 +467,10 @@
 </header>
 
 <main>
-  <section id="work" aria-labelledby="workTitle">
+  <section id="video" aria-labelledby="videoTitle">
     <div class="section-head">
-      <h2 id="workTitle">Recent Videos</h2>
-      <span id="workCount"></span>
+      <h2 id="videoTitle">Recent Videos</h2>
+      <span id="videoCount"></span>
     </div>
     <ul class="grid" id="grid"></ul>
   </section>
@@ -658,11 +658,11 @@ document.getElementById("heroSub").textContent = SITE.tagline;
   }, { threshold: 0.05 }).observe(cover);
 })();
 
-/* ---------- Work grid ---------- */
+/* ---------- Video grid ---------- */
 const grid = document.getElementById("grid");
 const previews = new WeakMap(); // tile element -> { start, stop }
 
-document.getElementById("workCount").textContent =
+document.getElementById("videoCount").textContent =
   String(VIDEOS.length).padStart(2, "0") + " " + (VIDEOS.length === 1 ? "piece" : "pieces");
 
 async function loadThumbnail(video, img) {
@@ -832,3 +832,5 @@ if (!socialList.children.length) socialList.remove();
 </script>
 </body>
 </html>
+
+
