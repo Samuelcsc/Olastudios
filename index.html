@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ola Studios — AI Films &amp; Videos</title>
+<meta name="description" content="Portfolio of AI-generated films, ads and stories. Get in touch to work together.">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Ola Studios — AI Films & Videos">
+<meta property="og:description" content="Portfolio of AI-generated films, ads and stories.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://player.vimeo.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #09090b;
+    --bg-2: #111114;
+    --line: rgba(255, 255, 255, 0.12);
+    --text: #f3f0ea;
+    --muted: #a09c94;
+    --rec: #f2231d;
+    --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+    --sans: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "DM Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --pad: clamp(20px, 4vw, 56px);
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  img { display: block; max-width: 100%; }
+  button { font: inherit; color: inherit; }
+
+  :focus-visible { outline: 2px solid var(--rec); outline-offset: 3px; }
+
+  /* Subtle film grain over everything */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px var(--pad);
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: linear-gradient(to bottom, rgba(9,9,11,0.7), rgba(9,9,11,0));
+  }
+  .nav {
+    transition: background .25s, backdrop-filter .25s;
+  }
+  .nav.scrolled {
+    background: rgba(9, 9, 11, 0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav a { text-decoration: none; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: var(--muted); transition: color .2s; }
+  .nav-links a:hover { color: var(--text); }
+  .brand { display: inline-flex; align-items: center; }
+  .brand img {
+    display: block;
+    width: clamp(64px, 7.5vw, 88px);
+    height: auto;
+    aspect-ratio: 1;
+    filter: drop-shadow(0 0 16px rgba(242, 35, 29, 0.35));
+    transition: transform .3s ease;
+  }
+  .brand:hover img { transform: scale(1.05); }
+  .rec-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--rec);
+    box-shadow: 0 0 10px rgba(242, 35, 29, 0.7);
+    animation: blink 1.6s steps(2, jump-none) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.25; } }
+
+  /* ---------- Cover-scaled Vimeo backgrounds ---------- */
+  /* Vimeo iframes letterbox. These rules scale the iframe so the video
+     always fills its container, like a native <video object-fit: cover>. */
+  .cover {
+    position: relative;
+    overflow: hidden;
+    container-type: size;
+    --r: 1.7778; /* video aspect ratio (width / height) */
+  }
+  .vbg {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: max(100cqw, calc(100cqh * var(--r)));
+    height: max(100cqh, calc(100cqw / var(--r)));
+    transform: translate(-50%, -50%);
+    border: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .6s ease;
+  }
+  .vbg.on { opacity: 1; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: flex-end;
+    background:
+      radial-gradient(60% 50% at 70% 30%, rgba(255,59,47,0.16), transparent 70%),
+      radial-gradient(50% 60% at 20% 80%, rgba(90,110,255,0.14), transparent 70%),
+      var(--bg-2);
+  }
+  .hero .cover { position: absolute; inset: 0; }
+  .hero-shade {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(to top, rgba(9,9,11,0.92) 0%, rgba(9,9,11,0.35) 45%, rgba(9,9,11,0.25) 100%);
+  }
+  .hero-inner {
+    position: relative;
+    width: 100%;
+    /* top padding keeps the timecode clear of the fixed nav on short screens */
+    padding: 150px var(--pad) clamp(40px, 8vh, 88px);
+  }
+  .timecode {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .timecode b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .hero h1 {
+    margin: 18px 0 0;
+    max-width: 14ch;
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(54px, 10.5vw, 148px);
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 em { font-style: italic; color: var(--rec); }
+  .hero-sub {
+    margin: 26px 0 0;
+    max-width: 46ch;
+    font-size: clamp(17px, 1.6vw, 20px);
+    color: #d8d4cc;
+  }
+  .hero-actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 14px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .2s, border-color .2s, transform .2s;
+  }
+  .btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
+  .btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .btn.primary:hover { background: #fff; }
+  .hero-hint {
+    display: none;
+    margin-top: 22px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .hero-hint.show { display: block; }
+
+  /* Vertical (9:16) showreel: on wide screens it sits in a phone-shaped frame
+     beside the headline instead of being cropped to a thin band. On phones it
+     stays full-bleed, which already matches the shape. */
+  .hero { --frame-w: min(34vw, calc(72svh * 0.5625)); }
+  @media (min-width: 900px) {
+    .hero.vertical .hero-shade { background: none; }
+    .hero.vertical .cover {
+      inset: auto;
+      top: 50%;
+      right: var(--pad);
+      width: var(--frame-w);
+      aspect-ratio: var(--r);
+      margin-top: 32px;
+      transform: translateY(-50%);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.65), 0 0 60px rgba(242, 35, 29, 0.12);
+    }
+    .hero.vertical .hero-inner { padding-right: calc(var(--frame-w) + var(--pad) * 2); }
+    .hero.vertical h1 { overflow-wrap: break-word; }
+  }
+
+  /* ---------- Work ---------- */
+  section { padding: clamp(72px, 12vw, 150px) var(--pad); }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: clamp(28px, 4vw, 52px);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+  }
+  .section-head h2 {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(40px, 6vw, 80px);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .section-head span {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* Portrait-first grid: 2 columns on phones, 3 on tablets, 4 on desktop.
+     Each tile takes its own video's shape; landscape pieces span two columns. */
+  .grid {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: grid;
+    align-items: start;
+    gap: clamp(14px, 2vw, 26px);
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-flow: dense;
+  }
+  @media (min-width: 720px)  { .grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1100px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+  .tile.landscape { grid-column: span 2; }
+  .tile-btn {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+  }
+  .tile-media {
+    aspect-ratio: 9 / 16; /* overridden per video in the script */
+    border-radius: 6px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    transition: border-color .25s, transform .35s;
+  }
+  .tile-btn:hover .tile-media,
+  .tile-btn:focus-visible .tile-media { border-color: rgba(255,255,255,0.35); }
+  .tile-thumb {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform .6s ease, opacity .3s;
+  }
+  .tile-btn:hover .tile-thumb { transform: scale(1.03); }
+  .tile-empty {
+    position: absolute; inset: 0;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 12px, transparent 12px 24px),
+      linear-gradient(135deg, #17171c, #0e0e12);
+  }
+  .tile-play {
+    position: absolute;
+    right: 14px; bottom: 14px;
+    width: 46px; height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(9,9,11,0.65);
+    border: 1px solid rgba(255,255,255,0.25);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: background .2s, transform .2s;
+  }
+  .tile-btn:hover .tile-play { background: var(--rec); border-color: var(--rec); transform: scale(1.08); }
+  .tile-play svg { width: 16px; height: 16px; fill: #fff; margin-left: 2px; }
+  .tile-meta { display: flex; gap: 14px; align-items: baseline; padding: 14px 2px 0; }
+  .tile-num { font-family: var(--mono); font-size: 12px; color: var(--rec); }
+  .tile-title { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.3; }
+  .tile-sub { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+
+  /* ---------- Contact ---------- */
+  .contact { border-top: 1px solid var(--line); background: var(--bg-2); }
+  .contact-lead {
+    margin: 0;
+    max-width: 18ch;
+    font-family: var(--serif);
+    font-size: clamp(44px, 8vw, 112px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  .contact-lead em { font-style: italic; color: var(--rec); }
+  .contact-note { margin: 24px 0 0; max-width: 52ch; color: var(--muted); }
+  .email-row { margin-top: 36px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+  .email-link {
+    font-family: var(--serif);
+    font-size: clamp(26px, 4.4vw, 54px);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+    transition: border-color .2s, color .2s;
+    word-break: break-all;
+  }
+  .email-link:hover { border-color: var(--rec); color: #fff; }
+  .copy-status {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    min-height: 1.2em;
+  }
+  .socials { margin: 40px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 12px; }
+  .socials a {
+    display: inline-block;
+    padding: 9px 18px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 13px;
+    text-decoration: none;
+    color: var(--muted);
+    transition: color .2s, border-color .2s;
+  }
+  .socials a:hover { color: var(--text); border-color: rgba(255,255,255,0.35); }
+
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 26px var(--pad);
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ---------- Modal player ---------- */
+  dialog {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+  }
+  dialog::backdrop { background: rgba(5,5,7,0.92); backdrop-filter: blur(6px); }
+  .player-shell { position: relative; }
+  .player-frame {
+    width: min(92vw, calc(84vh * var(--ratio)), 1280px);
+    aspect-ratio: var(--ratio);
+    background: #000;
+    border-radius: 6px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+  .player-frame iframe { width: 100%; height: 100%; border: 0; }
+  .player-msg { padding: 28px; text-align: center; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .player-caption { margin-top: 14px; display: flex; justify-content: space-between; gap: 16px; }
+  .player-caption h3 { margin: 0; font-size: 18px; font-weight: 500; }
+  .player-caption p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+  .close {
+    flex: none;
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.05);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .close:hover { background: rgba(255,255,255,0.12); }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  @media (max-width: 560px) {
+    .nav-links { gap: 18px; }
+    .tile-meta { gap: 10px; }
+    .tile-title { font-size: 15px; }
+    .tile-sub { font-size: 13px; }
+    .tile-play { width: 38px; height: 38px; right: 10px; bottom: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a class="brand" href="#top" aria-label="Ola Studios, back to top"><img id="navLogo" src="logo.png" alt="Ola Studios" width="88" height="88"></a>
+  <div class="nav-links">
+    <a href="#work">Work</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="cover" id="heroCover" aria-hidden="true"></div>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="timecode" aria-hidden="true">
+      <span class="rec-dot"></span><span>REC</span><b id="timecode">00:00:00:00</b>
+    </div>
+    <h1 id="heroTitle">Films imagined, <em>made with AI.</em></h1>
+    <p class="hero-sub" id="heroSub"></p>
+    <div class="hero-actions">
+      <a class="btn primary" href="#work">See the work</a>
+      <a class="btn" href="#contact">Get in touch</a>
+    </div>
+    <p class="hero-hint" id="heroHint">Add your showreel’s Vimeo ID in the SITE settings to play it here.</p>
+  </div>
+</header>
+
+<main>
+  <section id="work" aria-labelledby="workTitle">
+    <div class="section-head">
+      <h2 id="workTitle">Selected work</h2>
+      <span id="workCount"></span>
+    </div>
+    <ul class="grid" id="grid"></ul>
+  </section>
+
+  <section class="contact" id="contact" aria-labelledby="contactTitle">
+    <h2 class="contact-lead" id="contactTitle">Have a project in mind? <em>Let’s talk.</em></h2>
+    <p class="contact-note">Send a short note with what you’d like made, where it will be seen, and your timeline. I’ll reply with ideas and next steps.</p>
+    <div class="email-row">
+      <a class="email-link" id="emailLink" href="#"></a>
+      <button class="btn" type="button" id="copyBtn">Copy email</button>
+      <span class="copy-status" id="copyStatus" role="status" aria-live="polite"></span>
+    </div>
+    <ul class="socials" id="socials"></ul>
+  </section>
+</main>
+
+<footer>
+  <span id="footName"></span>
+  <span>All videos hosted on Vimeo</span>
+</footer>
+
+<dialog id="player" aria-label="Video player">
+  <div class="player-shell">
+    <div class="player-frame" id="playerFrame"></div>
+    <div class="player-caption">
+      <div>
+        <h3 id="playerTitle"></h3>
+        <p id="playerSub"></p>
+      </div>
+      <button class="close" type="button" id="closeBtn">Close</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/* =====================================================================
+   EDIT THIS SECTION — everything you need to customise lives here.
+   ===================================================================== */
+
+const SITE = {
+  name: "Ola Studios",
+  tagline: "AI-generated films, ads and stories — from first idea to final cut.",
+  email: "talktoolasanda@gmail.com",
+
+  // Vimeo ID of your showreel. It plays silently on loop behind the hero.
+  // The ID is the number at the end of the video's URL: vimeo.com/123456789
+  reelVimeoId: "YOUR_REEL_VIMEO_ID",
+  reelHash: "",            // only needed if the video is "unlisted" (the code after the ID)
+  reelRatio: "9:16",       // shape of your showreel: "9:16" vertical or "16:9" landscape
+
+  // Leave a url empty ("") to hide that link.
+  socials: [
+    { label: "Instagram", url: "" },
+    { label: "YouTube",   url: "" },
+    { label: "X",         url: "" },
+    { label: "LinkedIn",  url: "" },
+    { label: "TikTok",    url: "" }
+  ]
+};
+
+// One entry per video. Add, remove or reorder freely.
+// Tiles automatically take each video's shape; landscape videos are shown wider.
+//   id:    Vimeo ID (digits only)
+//   hash:  only for unlisted videos, otherwise leave ""
+//   ratio: "16:9" for landscape, "9:16" for vertical, "1:1" for square
+const VIDEOS = [
+  { id: "1240096397", hash: "", title: "The Life She didn't choose",   category: "Short film",  year: "2026", ratio: "9:16" },
+  { id: "1240096394", hash: "", title: "Bakes By Sarex",   category: "Ad",          year: "2026", ratio: "9:16" },
+  { id: "1240096395", hash: "", title: "Itel Power tank 1000", category: "Ad",      year: "2026", ratio: "9:16" },
+  { id: "1240096396", hash: "", title: "Couple Comedy",  category: "Short Film", year: "2025", ratio: "9:16" },
+];
+
+/* =====================================================================
+   Code below — you shouldn't need to change anything.
+   ===================================================================== */
+
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const canHover = window.matchMedia("(hover: hover)").matches;
+
+const isRealId = (id) => /^\d{6,}$/.test(String(id));
+
+function ratioNumber(ratio) {
+  const parts = String(ratio || "16:9").split(":").map(Number);
+  const w = parts[0], h = parts[1];
+  return w > 0 && h > 0 ? w / h : 16 / 9;
+}
+
+/** Builds a player.vimeo.com URL. */
+function vimeoUrl(id, hash, params) {
+  const q = new URLSearchParams(params);
+  if (hash) q.set("h", hash);
+  return "https://player.vimeo.com/video/" + encodeURIComponent(id) + "?" + q.toString();
+}
+
+/**
+ * The Vimeo "background mode" embed: background=1 hides every control and
+ * makes the video autoplay, loop and stay muted. autopause=0 stops it from
+ * pausing when another Vimeo player starts.
+ */
+function backgroundSrc(id, hash) {
+  return vimeoUrl(id, hash, {
+    background: "1",
+    autoplay: "1",
+    loop: "1",
+    muted: "1",
+    autopause: "0",
+    dnt: "1"
+  });
+}
+
+function makeBackgroundFrame(id, hash, ratio) {
+  const frame = document.createElement("iframe");
+  frame.className = "vbg";
+  frame.src = backgroundSrc(id, hash);
+  frame.allow = "autoplay; fullscreen; picture-in-picture";
+  frame.setAttribute("title", "Background video");
+  frame.setAttribute("aria-hidden", "true");
+  frame.tabIndex = -1;
+  frame.addEventListener("load", () => frame.classList.add("on"));
+  return frame;
+}
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text != null) node.textContent = text;
+  return node;
+}
+
+/* ---------- Basic text ---------- */
+document.title = SITE.name + " — AI Films & Videos";
+document.getElementById("navLogo").alt = SITE.name;
+document.getElementById("footName").textContent = "© " + new Date().getFullYear() + " " + SITE.name;
+document.getElementById("heroSub").textContent = SITE.tagline;
+
+/* ---------- Nav background once scrolled ---------- */
+(function navState() {
+  const nav = document.querySelector(".nav");
+  const update = () => nav.classList.toggle("scrolled", window.scrollY > 24);
+  update();
+  window.addEventListener("scroll", update, { passive: true });
+})();
+
+/* ---------- Timecode ticker ---------- */
+(function timecode() {
+  const node = document.getElementById("timecode");
+  if (reducedMotion) return;
+  const start = performance.now();
+  const pad = (n) => String(n).padStart(2, "0");
+  setInterval(() => {
+    const t = (performance.now() - start) / 1000;
+    const h = Math.floor(t / 3600);
+    const m = Math.floor((t % 3600) / 60);
+    const s = Math.floor(t % 60);
+    const f = Math.floor((t % 1) * 24);
+    node.textContent = pad(h) + ":" + pad(m) + ":" + pad(s) + ":" + pad(f);
+  }, 42);
+})();
+
+/* ---------- Hero background loop ---------- */
+(function hero() {
+  const cover = document.getElementById("heroCover");
+  const hint = document.getElementById("heroHint");
+  if (!isRealId(SITE.reelVimeoId)) {
+    hint.classList.add("show");
+    return;
+  }
+  if (reducedMotion) return;
+
+  const reelShape = ratioNumber(SITE.reelRatio);
+  cover.style.setProperty("--r", String(reelShape));
+  if (reelShape < 1) cover.parentElement.classList.add("vertical");
+
+  const frame = makeBackgroundFrame(SITE.reelVimeoId, SITE.reelHash);
+  cover.appendChild(frame);
+
+  // Best effort: pause the reel when it scrolls out of view, resume on return.
+  const send = (method) => {
+    try {
+      frame.contentWindow.postMessage(JSON.stringify({ method: method }), "https://player.vimeo.com");
+    } catch (e) { /* ignore */ }
+  };
+  new IntersectionObserver((entries) => {
+    send(entries[0].isIntersecting ? "play" : "pause");
+  }, { threshold: 0.05 }).observe(cover);
+})();
+
+/* ---------- Work grid ---------- */
+const grid = document.getElementById("grid");
+const previews = new WeakMap(); // tile element -> { start, stop }
+
+document.getElementById("workCount").textContent =
+  String(VIDEOS.length).padStart(2, "0") + " " + (VIDEOS.length === 1 ? "piece" : "pieces");
+
+async function loadThumbnail(video, img) {
+  try {
+    const url = "https://vimeo.com/" + video.id + (video.hash ? "/" + video.hash : "");
+    const res = await fetch("https://vimeo.com/api/oembed.json?width=1280&url=" + encodeURIComponent(url));
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.thumbnail_url) img.src = data.thumbnail_url;
+  } catch (e) { /* thumbnail stays empty; the preview still works */ }
+}
+
+VIDEOS.forEach((video, index) => {
+  const real = isRealId(video.id);
+  const shape = ratioNumber(video.ratio);
+  const item = el("li", "tile" + (shape > 1.2 ? " landscape" : ""));
+  const button = el("button", "tile-btn");
+  button.type = "button";
+  button.setAttribute("aria-label", "Play " + video.title);
+
+  const media = el("div", "tile-media cover");
+  media.style.setProperty("--r", String(shape));
+  media.style.aspectRatio = shape + " / 1";
+
+  if (real) {
+    const img = el("img", "tile-thumb");
+    img.alt = "";
+    img.loading = "lazy";
+    media.appendChild(img);
+    loadThumbnail(video, img);
+  } else {
+    media.appendChild(el("div", "tile-empty", "Add a Vimeo ID to show this video"));
+  }
+
+  const play = el("span", "tile-play");
+  play.setAttribute("aria-hidden", "true");
+  play.innerHTML = '<svg viewBox="0 0 16 16"><path d="M3 1.5v13l11-6.5z"/></svg>';
+  media.appendChild(play);
+
+  const meta = el("div", "tile-meta");
+  meta.appendChild(el("span", "tile-num", String(index + 1).padStart(2, "0")));
+  const text = el("div");
+  text.appendChild(el("h3", "tile-title", video.title));
+  text.appendChild(el("p", "tile-sub", [video.category, video.year].filter(Boolean).join(" · ")));
+  meta.appendChild(text);
+
+  button.appendChild(media);
+  button.appendChild(meta);
+  item.appendChild(button);
+  grid.appendChild(item);
+
+  button.addEventListener("click", () => openPlayer(video));
+
+  /* Silent looping preview (hover on desktop, in-view on touch devices) */
+  if (real && !reducedMotion) {
+    let frame = null;
+    const start = () => {
+      if (frame) return;
+      frame = makeBackgroundFrame(video.id, video.hash);
+      media.insertBefore(frame, play);
+    };
+    const stop = () => {
+      if (!frame) return;
+      frame.remove();
+      frame = null;
+    };
+    previews.set(item, { start: start, stop: stop });
+
+    if (canHover) {
+      item.addEventListener("pointerenter", start);
+      item.addEventListener("pointerleave", stop);
+      button.addEventListener("focus", start);
+      button.addEventListener("blur", stop);
+    }
+  }
+});
+
+if (!canHover && !reducedMotion && "IntersectionObserver" in window) {
+  const playing = []; // tiles currently previewing; capped so phones stay smooth
+  const touchObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const controls = previews.get(entry.target);
+      if (!controls) return;
+      const at = playing.indexOf(entry.target);
+      if (entry.isIntersecting) {
+        if (at === -1) playing.push(entry.target);
+        controls.start();
+        while (playing.length > 2) {
+          const oldest = playing.shift();
+          const old = previews.get(oldest);
+          if (old) old.stop();
+        }
+      } else {
+        if (at !== -1) playing.splice(at, 1);
+        controls.stop();
+      }
+    });
+  }, { threshold: 0.7 });
+  grid.querySelectorAll(".tile").forEach((tile) => touchObserver.observe(tile));
+}
+
+/* ---------- Modal player ---------- */
+const dialog = document.getElementById("player");
+const playerFrame = document.getElementById("playerFrame");
+
+function openPlayer(video) {
+  const ratio = ratioNumber(video.ratio);
+  playerFrame.style.setProperty("--ratio", String(ratio));
+  playerFrame.textContent = "";
+  document.getElementById("playerTitle").textContent = video.title;
+  document.getElementById("playerSub").textContent = [video.category, video.year].filter(Boolean).join(" · ");
+
+  if (isRealId(video.id)) {
+    const frame = document.createElement("iframe");
+    frame.src = vimeoUrl(video.id, video.hash, {
+      autoplay: "1",
+      title: "0",
+      byline: "0",
+      portrait: "0",
+      dnt: "1"
+    });
+    frame.allow = "autoplay; fullscreen; picture-in-picture";
+    frame.allowFullscreen = true;
+    frame.setAttribute("title", video.title);
+    playerFrame.appendChild(frame);
+  } else {
+    playerFrame.appendChild(el("p", "player-msg", "This tile has no Vimeo ID yet. Add one in the VIDEOS list."));
+  }
+  dialog.showModal();
+}
+
+function closePlayer() {
+  dialog.close();
+}
+
+dialog.addEventListener("close", () => { playerFrame.textContent = ""; }); // stops playback
+dialog.addEventListener("click", (event) => { if (event.target === dialog) closePlayer(); });
+document.getElementById("closeBtn").addEventListener("click", closePlayer);
+
+/* ---------- Contact ---------- */
+const emailLink = document.getElementById("emailLink");
+emailLink.textContent = SITE.email;
+emailLink.href = "mailto:" + SITE.email + "?subject=" + encodeURIComponent("Project enquiry");
+
+document.getElementById("copyBtn").addEventListener("click", async () => {
+  const status = document.getElementById("copyStatus");
+  try {
+    await navigator.clipboard.writeText(SITE.email);
+    status.textContent = "Email copied";
+  } catch (e) {
+    status.textContent = "Copy failed — select the address above instead";
+  }
+  setTimeout(() => { status.textContent = ""; }, 2400);
+});
+
+const socialList = document.getElementById("socials");
+SITE.socials.filter((s) => s.url).forEach((s) => {
+  const li = document.createElement("li");
+  const a = el("a", "", s.label);
+  a.href = s.url;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  li.appendChild(a);
+  socialList.appendChild(li);
+});
+if (!socialList.children.length) socialList.remove();
+</script>
+</body>
+</html>
